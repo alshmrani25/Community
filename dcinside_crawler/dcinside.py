@@ -11,7 +11,7 @@ import time
 import random
 
 
-def crawl_dcinside():
+def crawl_dcinside(filePath):
     pageCount = 1
     while True:
         page_url = 'http://gall.dcinside.com/board/lists/?id=samsunglions&page='
@@ -26,12 +26,12 @@ def crawl_dcinside():
             body_list = tr_list[tr_count].find('td', attrs={'class':'t_subject'})
             body_url =  'http://gall.dcinside.com'+body_list.find('a')['href']
             notice = tr_list[tr_count].find('td', attrs={'class':'t_subject'}).text
-            save_content(notice, body_url)
+            save_content(notice, body_url, filePath)
             #print(notice)
 
         pageCount+=30
 
-def save_content(cid, content_url):
+def save_content(cid, content_url, filePath):
 
     try:
         url_open = urllib.request.urlopen(content_url)
@@ -41,7 +41,7 @@ def save_content(cid, content_url):
 
     soup = BeautifulSoup(url_open, 'html.parser', from_encoding='utf-8')
 
-    f=open('/home/hknam/Documents/dcinside/samsunglions/'+cid+'.html', 'w')
+    f=open(filePath+cid+'.html', 'w')
     f.write(soup.prettify())
     f.close()
     print (cid+ ' save complete...')
@@ -52,7 +52,13 @@ def save_content(cid, content_url):
 
 
 def main():
-    crawl_dcinside()
+
+    if len(sys.argv)<2:
+        print('Need File Path')
+        sys.exit()
+
+    filePath = sys.argv[1]
+    crawl_dcinside(filePath)
 
 
 if __name__ == "__main__":
