@@ -14,7 +14,7 @@ import random
 def crawl_dcinside(filePath):
     pageCount = 1
     while True:
-        page_url = 'http://gall.dcinside.com/board/lists/?id=samsunglions&page='
+        page_url = 'http://gall.dcinside.com/board/lists/?id=samsunglions&page='+str(pageCount)
         url_open = urllib.request.urlopen(page_url)
 
         soup = BeautifulSoup(url_open, 'html.parser', from_encoding='utf-8')
@@ -25,11 +25,12 @@ def crawl_dcinside(filePath):
         for tr_count in range(1, len(tr_list)):
             body_list = tr_list[tr_count].find('td', attrs={'class':'t_subject'})
             body_url =  'http://gall.dcinside.com'+body_list.find('a')['href']
-            notice = tr_list[tr_count].find('td', attrs={'class':'t_subject'}).text
-            save_content(notice, body_url, filePath)
-            #print(notice)
 
-        pageCount+=30
+            notice = tr_list[tr_count].find('td', attrs={'class':'t_notice'}).text
+            save_content(notice, body_url, filePath)
+
+
+        pageCount+=1
 
 def save_content(cid, content_url, filePath):
 
@@ -48,6 +49,7 @@ def save_content(cid, content_url, filePath):
         print (cid+ ' save complete...')
     except UnicodeEncodeError as e:
         print(e)
+        return
     time.sleep(random.randrange(2,5))
 
 
