@@ -41,11 +41,13 @@ def save_content(cid, content_url, filePath):
 
     soup = BeautifulSoup(url_open, 'html.parser', from_encoding='utf-8')
 
-    f=open(filePath+cid+'.html', 'w')
-    f.write(soup.prettify())
-    f.close()
-    print (cid+ ' save complete...')
-
+    try:
+        f=open(filePath+cid+'.html', 'w')
+        f.write(soup.prettify())
+        f.close()
+        print (cid+ ' save complete...')
+    except UnicodeEncodeError as e:
+        print(e)
     time.sleep(random.randrange(2,5))
 
 
