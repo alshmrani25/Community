@@ -25,30 +25,32 @@ class Dcinside:
         #f = open(pageName+".txt", "w")
         pageCount = 1
         while True:
+            try:
+                page = "http://gall.dcinside.com/board/lists/?id=baseball_new&page="+str(pageCount)
+                url_open = urllib.request.urlopen(page)
 
-            page = "http://gall.dcinside.com/board/lists/?id=baseball_new&page="+str(pageCount)
-            url_open = urllib.request.urlopen(page)
+                soup = BeautifulSoup(url_open, 'html.parser', from_encoding = 'utf-8')
+                obj = soup.findAll('tr', attrs = {'class':'tb'})
 
-            soup = BeautifulSoup(url_open, 'html.parser', from_encoding = 'utf-8')
-            obj = soup.findAll('tr', attrs = {'class':'tb'})
+                for j in range(1, len(obj)):
 
-            for j in range(1, len(obj)):
+                    b = obj[j].find('td', attrs={'class':'t_subject'})
+                    url = 'http://gall.dcinside.com'+b.find('a')['href']
 
-                b = obj[j].find('td', attrs={'class':'t_subject'})
-                url = 'http://gall.dcinside.com'+b.find('a')['href']
+                    notice = obj[j].find('td', attrs={'class':'t_notice'}).text
+                    body_url_open = urllib.request.urlopen(url)
+                    body_soup = BeautifulSoup(body_url_open, 'html.parser', from_encoding="utf-8")
+                    html_source = str(body_soup.prettify())
+                    f=open("/home/hknam/Documents/dcinside/data/"+str(notice)+".html", "w")
+                    f.write(html_source)
+                    f.close()
+                    print(notice, str(pageCount)+" page")
+                    time.sleep(random.randrange(2,5))
 
-                notice = obj[j].find('td', attrs={'class':'t_notice'}).text
-                body_url_open = urllib.request.urlopen(url)
-                body_soup = BeautifulSoup(body_url_open, 'html.parser', from_encoding="utf-8")
-                html_source = str(body_soup.prettify())
-                f=open("/home/hknam/Documents/dcinside/data/"+str(notice)+".html", "w")
-                f.write(html_source)
-                f.close()
-                print(notice, str(pageCount)+" page")
-                time.sleep(random.randrange(2,5))
-
-            pageCount+=1
-
+                pageCount+=1
+            except UnicodeEncodeError as e:
+                print e
+                continue
 
 def main():
     '''

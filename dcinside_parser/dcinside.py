@@ -13,3 +13,4 @@ def read_file(dirname):
 def parse_html(filePath):
     url_open = urllib.urlopen(filePath)
     soup = BeautifulSoup(url_open, 'html.parser')
+
