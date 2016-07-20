@@ -10,62 +10,49 @@ import time
 
 import random
 
-class Dcinside:
 
-    """
-    주식갤 : id=stock_new1
-    인방갤 : id=ib
-    국내야갤 : id=baseball_new4
-    기타국내드라마 : id=drama_new
-    던전앤파이터 : id=d_fighter_new
-    """
+def crawl_dcinside():
+    pageCount = 1
+    while True:
+        page_url = 'http://gall.dcinside.com/board/lists/?id=samsunglions&page='
+        url_open = urllib.request.urlopen(page_url)
 
-    def crawl(self):
+        soup = BeautifulSoup(url_open, 'html.parser', from_encoding='utf-8')
 
-        #f = open(pageName+".txt", "w")
-        pageCount = 1
-        while True:
-            try:
-                page = "http://gall.dcinside.com/board/lists/?id=baseball_new&page="+str(pageCount)
-                url_open = urllib.request.urlopen(page)
+        tr_list = soup.findAll('tr', attrs={'class':'tb'})
 
-                soup = BeautifulSoup(url_open, 'html.parser', from_encoding = 'utf-8')
-                obj = soup.findAll('tr', attrs = {'class':'tb'})
 
-                for j in range(1, len(obj)):
+        for tr_count in range(1, len(tr_list)):
+            body_list = tr_list[tr_count].find('td', attrs={'class':'t_subject'})
+            body_url =  'http://gall.dcinside.com'+body_list.find('a')['href']
+            notice = tr_list[tr_count].find('td', attrs={'class':'t_subject'}).text
+            save_content(notice, body_url)
+            #print(notice)
 
-                    b = obj[j].find('td', attrs={'class':'t_subject'})
-                    url = 'http://gall.dcinside.com'+b.find('a')['href']
+        pageCount+=30
 
-                    notice = obj[j].find('td', attrs={'class':'t_notice'}).text
-                    body_url_open = urllib.request.urlopen(url)
-                    body_soup = BeautifulSoup(body_url_open, 'html.parser', from_encoding="utf-8")
-                    html_source = str(body_soup.prettify())
-                    f=open("/home/hknam/Documents/dcinside/data/"+str(notice)+".html", "w")
-                    f.write(html_source)
-                    f.close()
-                    print(notice, str(pageCount)+" page")
-                    time.sleep(random.randrange(2,5))
+def save_content(cid, content_url):
 
-                pageCount+=1
-            except UnicodeEncodeError as e:
-                print e
-                continue
+    try:
+        url_open = urllib.request.urlopen(content_url)
+    except UnicodeEncodeError as e:
+        print(cid, e)
+        return
+
+    soup = BeautifulSoup(url_open, 'html.parser', from_encoding='utf-8')
+
+    f=open('/home/hknam/Documents/dcinside/samsunglions/'+cid+'.html', 'w')
+    f.write(soup.prettify())
+    f.close()
+    print (cid+ ' save complete...')
+
+    time.sleep(random.randrange(2,5))
+
+
+
 
 def main():
-    '''
-    print("stock_new1, baseball_new4, ib, drama_new")
-    pageName = input("Enter page name : ")
-    if len(sys.argv) < 1:
-        print("Need Page Name")
-    stock = "stock_new1"
-    ib = "ib"
-    baseball = "baseball_new4"
-    drama = "drama_new"
-    '''
-    dcinside = Dcinside()
-    #dcinside.crawl(stock, 20)
-    dcinside.crawl()
+    crawl_dcinside()
 
 
 if __name__ == "__main__":
